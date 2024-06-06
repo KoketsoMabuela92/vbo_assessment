@@ -33,7 +33,7 @@
 
 ## Swagger Documentation
 
-The Swagger YAML document can be accessed at: `http://localhost/swagger.yaml`
+The Swagger YAML document can be accessed at: `http://127.0.0.1:8000/api/documentation`
 
 ## Design Decisions
 - Used Laravel for robust and easy API development.
