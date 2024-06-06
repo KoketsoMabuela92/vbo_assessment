@@ -3,10 +3,39 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Payment;
+use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function createPayment(Request $request) {
+    /**
+     * @OA\Post(
+     *     path="/api/payments",
+     *     tags={"Payments"},
+     *     summary="Create a new payment request",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"amount","currency","customer_email"},
+     *             @OA\Property(property="amount", type="number", format="float"),
+     *             @OA\Property(property="currency", type="string", maxLength=3),
+     *             @OA\Property(property="customer_email", type="string", format="email")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Payment request created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="redirect_url", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
+    public function createPayment(Request $request)
+    {
         $validated = $request->validate([
             'amount' => 'required|numeric',
             'currency' => 'required|string|max:3',
@@ -43,7 +72,32 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function handleIPN(Request $request) {
+    /**
+     * @OA\Post(
+     *     path="/api/payments/ipn",
+     *     tags={"Payments"},
+     *     summary="Handle IPN notifications",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"pf_payment_id","amount_gross"},
+     *             @OA\Property(property="pf_payment_id", type="string"),
+     *             @OA\Property(property="amount_gross", type="number", format="float")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="IPN handled",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
+    public function handleIPN(Request $request)
+    {
         // Mock validation and payload verification for simplicity
         $mockResponse = [
             'payment_status' => 'COMPLETE',
@@ -63,5 +117,4 @@ class PaymentController extends Controller
 
         return response()->json(['status' => 'success']);
     }
-
 }
